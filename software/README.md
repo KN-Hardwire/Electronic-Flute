@@ -1,11 +1,15 @@
 # Software
 
-## Dependencies
-- CMake
-- GCC or other C compiler
-- pico-sdk for C/C++ installed locally (with necessary modules)
+## Installing
+You can install already compiled firmware on github by going to **Actions**
+section and choosing the latest passing commit on the **build** workflow.
+There you will find the **'firmware'** binary ready to download.
 
-## Build
+## Dependencies
+- pico-sdk for C/C++ (included as submodule)
+
+## Compiling
+To compile the firmware locally you must first:   
 Initialize pico-sdk and its submodules:
 ```
 git submodule update --init --recursive
@@ -19,7 +23,8 @@ cmake ..
 ```
 *No debug and int32_t type on default*
 
-Available CMake flags:
+There are CMake flags available for easier debugging and development,
+which you don't need to worry about them for standard compilation:
 ```
 -DDEBUG_MODE=<OFF/ON> -DPROJECT_TYPE=<INT/FLOAT>
 ```
