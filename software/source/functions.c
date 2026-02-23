@@ -84,8 +84,23 @@ uint16_t get_volume(void) {
 	return MAX_VOLUME;
 }
 
+uint8_t standardize_mask(const uint8_t mask) {
+    uint8_t result = 0;
+
+    for (int i = 7; i >= 0; i--) {
+
+        if ((mask & (1 << i)) != 0) {
+            result |= (1 << i);
+        } else {
+
+            break; 
+        }
+    }
+    return result;
+}
+
 project_type get_frequency(const uint8_t mask) {
-	switch (standardize_mask(mask)) {
+    switch (standardize_mask(mask)) {
         case 0b11111111: return NOTE_C4;
         case 0b11111110: return NOTE_D4;
         case 0b11111100: return NOTE_E4;
@@ -95,20 +110,6 @@ project_type get_frequency(const uint8_t mask) {
         case 0b11000000: return NOTE_B4;
         case 0b10000000: return NOTE_C5;
         case 0b00000000: return NOTE_D5;
-		default: return 0;
-	}
+        default: return 0;
+    }
 }
-
-uint8_t standardize_mask(const uint8_t mask) {
-	uint8_t check_mask = 0b10000000;
-	for (register uint8_t i = 0; i < BUTTON_COUNT; ++i) {
-		if ((mask & check_mask) != check_mask) {
-			check_mask = 0b11111111;
-			check_mask = check_mask << (BUTTON_COUNT - i);
-			break;
-		}
-		check_mask = check_mask >> 1;
-	}
-	return get_frequency(check_mask);
-}
-
