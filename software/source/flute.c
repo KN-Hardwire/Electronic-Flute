@@ -28,6 +28,8 @@ int main(void) {
 			}
 		}
 		generate_square_wave(get_frequency(button_mask), get_volume());
+
+		sleep_ms(2);	// slow down work to reduce power consumed
 	}
 
     return EXIT_SUCCESS;
