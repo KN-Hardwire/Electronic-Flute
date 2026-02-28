@@ -1,27 +1,58 @@
 #include "functions.h"
 
-void generate_square_wave(const project_type freq, const uint16_t volume) {
+void generate_square_wave(const project_type freq, uint16_t volume) {
+	/* Division by 0 check */
+	if (freq < 1) volume = 0;
+
     const uint8_t slice_num = pwm_gpio_to_slice_num(OUT_PIN);
-	project_type clk_div = (PWM_CLOCK_FREQ / (DUTY + 1)) / freq;
+    float clk_div;
+    
+    #if PROJECT_TYPE == PROJECT_INT
+        // Calculate with floating point for accuracy, then round to nearest
+        float target_div = (float)(PWM_CLOCK_FREQ / (DUTY + 1)) / (float)freq;
+        clk_div = target_div;
+        
+        // Round to nearest supported divider value
+        // RP2040 supports 1-255 with 1/16 fractional steps
+        uint32_t div_int = (uint32_t)target_div;
+        uint32_t div_frac = (uint32_t)((target_div - div_int) * 16.0f + 0.5f);
+        
+        if (div_frac >= 16) {
+            div_int++;
+            div_frac = 0;
+        }
+        
+        clk_div = div_int + (div_frac / 16.0f);
+    #else
+        // For floating point, still need to account for hardware limitations
+        float target_div = ((float)PWM_CLOCK_FREQ / (float)(DUTY + 1)) / freq;
+        
+        // Quantize to nearest 1/16 step
+        uint32_t div_int = (uint32_t)target_div;
+        uint32_t div_frac = (uint32_t)((target_div - div_int) * 16.0f + 0.5f);
+        
+        if (div_frac >= 16) {
+            div_int++;
+            div_frac = 0;
+        }
+        
+        clk_div = div_int + (div_frac / 16.0f);
+    #endif
 
-	// Lower bound
-	#if PROJECT_TYPE == PROJECT_INT
-    	if (clk_div < 1) clk_div = 1; 
-	#elif PROJECT_TYPE == PROJECT_FLOAT
-    	if (clk_div < 1.0f) clk_div = 1.0f;
-	#endif
-	
-	#if DEBUG_MODE == 1
-		(void) printf("volume: %d\n", volume);
-	#endif
+    // Lower bound check
+    if (clk_div < 1.0f) clk_div = 1.0f;
+    
+    #if DEBUG_MODE == 1
+        printf("freq: %f, target_div: %f, actual_div: %f\n", 
+               (float)freq, target_div, clk_div);
+    #endif
 
-	project_type out_duty = volume_to_duty(volume) * (DUTY / 2);
+    project_type out_duty = volume_to_duty(volume) * (DUTY / 2);
+    
     pwm_set_clkdiv(slice_num, clk_div);
     pwm_set_wrap(slice_num, DUTY);
     pwm_set_chan_level(slice_num, pwm_gpio_to_channel(OUT_PIN), out_duty);
     pwm_set_enabled(slice_num, true);
-
-    return;
 }
 
 project_type volume_to_duty(uint16_t volume) {
@@ -84,31 +115,28 @@ uint16_t get_volume(void) {
 	return MAX_VOLUME;
 }
 
-project_type get_frequency(const uint8_t mask) {
-	switch (standardize_mask(mask)) {
-        case 0b11111111: return NOTE_C4;
-        case 0b11111110: return NOTE_D4;
-        case 0b11111100: return NOTE_E4;
-        case 0b11111000: return NOTE_F4;
-        case 0b11110000: return NOTE_G4;
-        case 0b11100000: return NOTE_A4;
-        case 0b11000000: return NOTE_B4;
-        case 0b10000000: return NOTE_C5;
-        case 0b00000000: return NOTE_D5;
-		default: return 0;
-	}
-}
+project_type get_frequency(uint8_t button_mask) {
+	/* Check for pressed buttons - button 7 modifies the frequency */
+	uint8_t base_note = 8;
+	bool octave_shift = false;
 
-uint8_t standardize_mask(const uint8_t mask) {
-	uint8_t check_mask = 0b10000000;
-	for (register uint8_t i = 0; i < BUTTON_COUNT; ++i) {
-		if ((mask & check_mask) != check_mask) {
-			check_mask = 0b11111111;
-			check_mask = check_mask << (BUTTON_COUNT - i);
+	for (uint8_t button = 0; button < BUTTON_COUNT - 1; ++button) {
+		if ((button_mask >> button) & 1) {
+			base_note = button;   // First 0-6 button pressed determines note
 			break;
 		}
-		check_mask = check_mask >> 1;
 	}
-	return get_frequency(check_mask);
-}
+	if (base_note == 8) {
+		base_note = 7;
+	}
+	if ((button_mask >> (BUTTON_COUNT-1)) & 1) {
+		octave_shift = true;  // Button 7 pressed - enable 2x frequency
+	}
 
+	// Apply octave shift if button 7 is pressed
+	if (octave_shift) {
+		return ((project_type)(note_frequencies[base_note] * 2));
+	} else {
+		return note_frequencies[base_note];
+	}
+}

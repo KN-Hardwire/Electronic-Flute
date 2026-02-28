@@ -23,11 +23,12 @@ int main(void) {
     while (true) {
 		button_mask = 0;
 		for (register uint8_t i = 0; i < BUTTON_COUNT; ++i) {
-			if (!gpio_get(buttons[i])) {
+			if (gpio_get(buttons[i])) {
 				button_mask |= (1 << i);
 			}
 		}
-		generate_square_wave(get_frequency(button_mask), get_volume());
+		// generate_square_wave(get_frequency(button_mask), get_volume());
+		generate_square_wave(get_frequency(button_mask), 50);
 
 		sleep_ms(2);	// slow down work to reduce power consumed
 	}
