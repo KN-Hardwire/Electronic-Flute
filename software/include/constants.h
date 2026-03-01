@@ -13,16 +13,16 @@
     #define PWM_CLOCK_FREQ		((project_type)	125000000.0)
 #endif
 
+#define ALPHA                   ((float) 0.9f)  // Smoothing factor for volume (0.0 - 1.0)
+
 #define ADC_PREAMP			    ((uint16_t) 100)	            // <-- tuning
 #define DIFF_THRESHOLD		    ((uint16_t) 100)	            // <-- tuning
 
-#define DIFF_BUFFER_SIZE	    ((uint16_t)	100)	            // <-- tuning
-#define DIFF_COUNT_THRESHOLD	((uint16_t) 20)                 // <-- tuning
-#define DIFF_COUNT_MAX			((uint16_t) 80)                 // <-- tuning
-#define MID_VOLUME              ((uint16_t) ((DIFF_COUNT_MAX - DIFF_COUNT_THRESHOLD)*4/5))
-#define MAX_VOLUME			    ((uint16_t) (DIFF_COUNT_MAX - DIFF_COUNT_THRESHOLD))
+#define DIFF_BUFFER_SIZE	        ((uint16_t)	100)	            // <-- tuning
+#define DIFF_COUNT_LOW_THRESHOLD	((uint16_t) 20)                 // <-- tuning
+#define DIFF_COUNT_HIGH_THRESHOLD	((uint16_t) 80)                 // <-- tuning
 
-#define FILTER_BUFFER_SIZE	    ((uint16_t)	300)	            // <-- tuning
+#define MAX_VOLUME			        (DIFF_COUNT_HIGH_THRESHOLD - DIFF_COUNT_LOW_THRESHOLD)
 
 #if PROJECT_TYPE == PROJECT_INT
     #define CALC_DUTY_POW		((project_type) 2)
@@ -30,5 +30,4 @@
     #define CALC_DUTY_POW		((project_type) 2.2)
 #endif
 
-#endif
-
+#endif // CONSTANTS_H

@@ -61,5 +61,4 @@
     };
 #endif
 
-#endif
-
+#endif // NOTES_H

@@ -14,5 +14,4 @@
 #define ADC26       ((uint8_t) 26)  // Microphone ADC input
 #define OUT_PIN     ((uint8_t) 12)  // Audio PWM output
 
-#endif
-
+#endif // PINS_H

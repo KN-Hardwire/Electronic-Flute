@@ -4,7 +4,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# == DO NOT EDIT (VS Code extension integration) ==
+# == VS Code extension integration ==
 if(WIN32)
     set(USERHOME $ENV{USERPROFILE})
 else()
@@ -52,9 +52,6 @@ include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
 file(GLOB FLUTE_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/source/*.c
 )
-
-# (optional) also add main flute.c if it is not in /source
-# file(GLOB FLUTE_SOURCES ${FLUTE_SOURCES} ${CMAKE_CURRENT_LIST_DIR}/flute.c)
 
 # Create executable
 add_executable(flute
@@ -106,4 +103,3 @@ endif()
 
 # Generate map/bin/hex files
 pico_add_extra_outputs(flute)
-

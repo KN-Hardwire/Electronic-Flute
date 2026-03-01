@@ -1,23 +1,5 @@
 #include "functions.h"
 
-#define ALPHA 0.9f  // Smoothing factor (0.0 - 1.0)
-
-uint16_t lowpass_iir(uint16_t new_sample) {
-    static float filtered = 0;
-    static bool first_run = true;
-    
-    if (first_run) {
-        filtered = new_sample;
-        first_run = false;
-        return new_sample;
-    }
-    
-    // IIR filter: y[n] = α * x[n] + (1-α) * y[n-1]
-    filtered = (ALPHA * new_sample) + ((1.0f - ALPHA) * filtered);
-    
-    return (uint16_t)filtered;
-}
-
 int main(void) {
 	// stdio_init_all();
 
@@ -45,12 +27,9 @@ int main(void) {
 				button_mask |= (1 << i);
 			}
 		}
-		generate_square_wave(get_frequency(button_mask)/4, lowpass_iir(get_volume()));
-		// generate_square_wave(get_frequency(button _mask), 50);
 
-		// sleep_us(1);	// slow down work to reduce power consumed
+		generate_square_wave(get_frequency(button_mask), lowpass_iir(get_volume()));
 	}
 
     return EXIT_SUCCESS;
 }
-

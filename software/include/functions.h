@@ -19,11 +19,6 @@ void generate_square_wave(const project_type freq, const uint16_t volume);
 project_type volume_to_duty(uint16_t volume);
 project_type get_frequency(const uint8_t mask);
 uint16_t get_volume(void);
-project_type index_to_note(uint8_t button_index);
+uint16_t lowpass_iir(uint16_t new_sample);
 
-// static inline bool button_pressed(uint8_t bitmask, uint8_t button_index) {
-//     return (bitmask >> button_index) & 1;
-// }
-
-#endif
-
+#endif // FUNCTIONS_H
