@@ -107,27 +107,16 @@ uint16_t lowpass_iir(uint16_t new_sample) {
 }
 
 float get_frequency(uint8_t button_mask) {
-	/* Check for pressed buttons - button 7 modifies the frequency */
-	uint8_t base_note = 8;
-	bool octave_shift = false;
-
+	uint8_t base_note = 0;
 	for (uint8_t button = 0; button < BUTTON_COUNT - 1; ++button) {
 		if ((button_mask >> button) & 1) {
-			base_note = button;   // First 0-6 button pressed determines note
+			base_note = button;
 			break;
 		}
 	}
-	if (base_note == 8) {
-		base_note = 7;
+	// check octave shift button
+	if ((button_mask >> 7) & 1) {
+		return (note_frequencies[base_note]) / 2;
 	}
-	if ((button_mask >> (BUTTON_COUNT-1)) & 1) {
-		octave_shift = true;  // Button 7 pressed - enable 2x frequency
-	}
-
-	// Apply octave shift if button 7 is pressed
-	if (octave_shift) {
-		return ((float)(note_frequencies[base_note] * 2));
-	} else {
-		return note_frequencies[base_note];
-	}
+	return (note_frequencies[base_note]);
 }
