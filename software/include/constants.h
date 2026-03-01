@@ -14,7 +14,7 @@
 #define CALC_DUTY_POW		    ((double) 2.2) 
 
 // Smoothing factor for volume (0.0 - 1.0)
-#define ALPHA                   ((float) 0.9f)              // <-- tuning
+#define ALPHA                   ((float) 0.002f)              // <-- tuning
 
 #define ADC_PREAMP			    ((uint16_t) 100)	        // <-- tuning
 #define DIFF_THRESHOLD		    ((uint16_t) 100)	        // <-- tuning
