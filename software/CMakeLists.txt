@@ -100,8 +100,9 @@ if (PICO_CYW43_SUPPORTED)
     target_link_libraries(flute pico_cyw43_arch_none)
 endif()
 
-pico_enable_stdio_usb(flute 1)
-pico_enable_stdio_uart(flute 0)
+# pico_enable_stdio_usb(flute 1)
+# pico_enable_stdio_uart(flute 0)
+# pico_enable_stdio_semihosting (flute 1)
 
 # Generate map/bin/hex files
 pico_add_extra_outputs(flute)

@@ -61,17 +61,21 @@ project_type volume_to_duty(uint16_t volume) {
     return (project_type) pow((double) x, (double) CALC_DUTY_POW);
 }
 
-
-
 uint16_t get_volume(void) {
 	static uint16_t diff_buffer[DIFF_BUFFER_SIZE] = {0};
 	static uint16_t buffer_index = 0;
+	#define RETURN_VALUE_JUMP 1
+	static uint16_t return_value = 0;
+	static bool first_return = true;
 
 	// How many pass threshold
 	static uint16_t diff_count = 0;
 
 	static uint16_t last_adc_measure = 0;
 	static uint64_t last_time_measure = 0;
+
+	static uint16_t filter_buffer[FILTER_BUFFER_SIZE];
+	static uint16_t filter_buffer_idx = 0;
 
 	uint16_t new_adc_measure = adc_read() * ADC_PREAMP;
 	uint64_t new_time_measure = time_us_64();
@@ -104,6 +108,12 @@ uint16_t get_volume(void) {
 	 * DIFF_COUNT_MAX < diff_count <= DIFF_BUFFER_SIZE		--> Round to max volume
 	 */
 
+	if (first_return) {
+		first_return = false;
+		return 0;
+	}
+
+	// VERSION OG
 	if (diff_count <= DIFF_COUNT_THRESHOLD) {
 		return 0;
 	}
@@ -112,8 +122,193 @@ uint16_t get_volume(void) {
 		return (diff_count - DIFF_COUNT_THRESHOLD);
 	}
 
-	return MAX_VOLUME;
+	// return MAX_VOLUME;
+
+	// PROTOTYPE VERSION 1
+	// uint16_t tmp = diff_count;
+	// if (tmp <= DIFF_COUNT_THRESHOLD) {
+	// 	tmp = 0;
+	// } else if (tmp <= DIFF_COUNT_MAX) {
+	// 	tmp = (tmp - DIFF_COUNT_THRESHOLD);
+	// } else {
+	// 	tmp = MAX_VOLUME;
+	// }
+	//
+	// if (tmp > return_value) {
+	// 	return_value += RETURN_VALUE_JUMP;
+	// } else if (tmp < return_value) {
+	// 	if (tmp <= RETURN_VALUE_JUMP) {
+	// 		return_value = 0;
+	// 	} else {
+	// 		return_value -= RETURN_VALUE_JUMP;
+	// 	}
+	// }
+	// if (return_value > MAX_VOLUME) {
+	// 	return_value = MAX_VOLUME;
+	// }
+
+	// return return_value;
+
+	// PROTOTYPE VERSION 2
+	// uint16_t tmp = diff_count;
+	// if (tmp <= DIFF_COUNT_THRESHOLD) {
+	// 	// tmp < low_thresh
+	// 	tmp = 0;
+	// // } else if (tmp <= DIFF_COUNT_MAX) {
+	// // 	// low_thresh < tmp < max_thresh
+	// // 	tmp = MID_VOLUME;
+	// } else { // max_thresh < tmp
+	// 	tmp = MAX_VOLUME;
+	// }
+
+	// return tmp
+	
+	// filter_buffer[filter_buffer_idx] = tmp;
+	// filter_buffer_idx = (filter_buffer_idx + 1)%FILTER_BUFFER_SIZE;
+
+	// uint16_t zero_count = 0;
+	// uint16_t mid_count = 0;
+	// uint16_t max_count = 0;
+	// for(uint16_t i = 0; i<FILTER_BUFFER_SIZE; i++){
+	// 	switch(filter_buffer[i]){
+	// 		case 0:
+	// 			zero_count++;
+	// 			break;
+	// 		case MID_VOLUME:
+	// 			mid_count++;
+	// 			break;
+	// 		case MAX_VOLUME:
+	// 			max_count++;
+	// 			break;
+		
+	// 	}
+	// }
+
+	// if (zero_count>max_count&&zero_count>mid_count){
+	// 	return 0;
+	// } else if (mid_count>max_count&&mid_count>max_count){
+	//  	return MID_VOLUME;
+	// } else if (max_count>zero_count&&max_count>mid_count){
+	// 	return MAX_VOLUME;
+	// } else {
+	// 	return 0;
+	// }
+	
+
+
+	// if (tmp > return_value) {
+	// 	return_value += RETURN_VALUE_JUMP;
+	// } else if (tmp < return_value) {
+	// 	if (tmp <= RETURN_VALUE_JUMP) {
+	// 		return_value = 0;
+	// 	} else {
+	// 		return_value -= RETURN_VALUE_JUMP;
+	// 	}
+	// }
+	// if (return_value > MAX_VOLUME) {
+	// 	return_value = MAX_VOLUME;
+	// }
+	
 }
+
+// uint16_t get_volume(void) {
+//     static uint16_t diff_buffer[DIFF_BUFFER_SIZE] = {0};
+//     static uint16_t buffer_index = 0;
+//     static uint16_t diff_count = 0;
+//     static uint16_t last_adc_measure = 0;
+//     static uint64_t last_time_measure = 0;
+    
+//     // SMOOTHING 1: Filter the raw ADC input
+//     static uint16_t filtered_adc = 0;
+//     static bool first_run = true;
+    
+//     uint16_t new_adc_measure = adc_read() * ADC_PREAMP;
+    
+//     // Exponential moving average on ADC
+//     if (first_run) {
+//         filtered_adc = new_adc_measure;
+//         first_run = false;
+//     } else {
+//         // 90% old, 10% new - heavy smoothing
+//         filtered_adc = (filtered_adc * 9 + new_adc_measure) / 10;
+//     }
+    
+//     uint64_t new_time_measure = time_us_64();
+    
+//     // Skip first reading
+//     if (last_time_measure == 0) {
+//         last_adc_measure = filtered_adc;
+//         last_time_measure = new_time_measure;
+//         return 0;
+//     }
+    
+//     // Calculate time difference with minimum protection
+//     uint64_t time_diff = new_time_measure - last_time_measure;
+//     if (time_diff < 100) time_diff = 100;  // Prevent division by tiny numbers
+    
+//     // SMOOTHING 2: Use filtered ADC for difference
+//     uint16_t new_diff = abs(filtered_adc - last_adc_measure) / time_diff;
+    
+//     // SMOOTHING 3: Limit maximum change per sample
+//     #define MAX_DIFF_CHANGE 10
+//     static uint16_t last_diff = 0;
+//     if (abs(new_diff - last_diff) > MAX_DIFF_CHANGE) {
+//         if (new_diff > last_diff) {
+//             new_diff = last_diff + MAX_DIFF_CHANGE;
+//         } else {
+//             new_diff = last_diff - MAX_DIFF_CHANGE;
+//         }
+//     }
+//     last_diff = new_diff;
+    
+//     // Update circular buffer
+//     diff_buffer[buffer_index] = new_diff;
+//     buffer_index = (buffer_index + 1) % DIFF_BUFFER_SIZE;
+    
+//     // Update diff_count
+//     if (new_diff > DIFF_THRESHOLD) {
+//         if (diff_count < DIFF_BUFFER_SIZE) diff_count++;
+//     }
+//     if (diff_buffer[buffer_index] > DIFF_THRESHOLD) {
+//         if (diff_count > 0) diff_count--;
+//     }
+    
+//     last_adc_measure = filtered_adc;
+//     last_time_measure = new_time_measure;
+    
+//     // SMOOTHING 4: Apply IIR filter to the final volume
+//     static uint16_t smoothed_volume = 0;
+//     uint16_t raw_volume;
+    
+//     // Calculate raw volume
+//     if (diff_count <= DIFF_COUNT_THRESHOLD) {
+//         raw_volume = 0;
+//     } else if (diff_count <= DIFF_COUNT_MAX) {
+//         raw_volume = (diff_count - DIFF_COUNT_THRESHOLD);
+//     } else {
+//         raw_volume = MAX_VOLUME;
+//     }
+    
+//     // SMOOTHING 5: Exponential moving average on volume
+//     // 80% old, 20% new - adjustable for response speed
+//     #define VOLUME_SMOOTHING 4  // 1 = fastest, higher = smoother
+    
+//     if (smoothed_volume == 0) {
+//         smoothed_volume = raw_volume;
+//     } else {
+//         smoothed_volume = (smoothed_volume * (VOLUME_SMOOTHING * 2) + 
+//                           raw_volume * 2) / ((VOLUME_SMOOTHING * 2) + 2);
+//     }
+    
+//     // SMOOTHING 6: Add hysteresis to prevent jitter near thresholds
+//     #define HYSTERESIS 1
+//     static uint16_t last_returned = 0;
+//     if (abs(smoothed_volume - last_returned) > HYSTERESIS) {
+//         last_returned = smoothed_volume;
+//     }
+    
+//     return last_returned;
+// }
 
 project_type get_frequency(uint8_t button_mask) {
 	/* Check for pressed buttons - button 7 modifies the frequency */
