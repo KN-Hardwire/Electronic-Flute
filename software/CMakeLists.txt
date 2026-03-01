@@ -62,29 +62,12 @@ add_executable(flute
 # Compile definitions
 # =====================================================
 
-# Common numeric identifiers
-target_compile_definitions(flute PRIVATE
-    PROJECT_INT=1
-    PROJECT_FLOAT=2
-)
-
 # Debug mode (0 or 1)
 target_compile_definitions(flute PRIVATE
     DEBUG_MODE=$<BOOL:${DEBUG_MODE}>
 )
 
 message("${DEBUG_MODE}")
-
-# Project type selection
-if(PROJECT_TYPE STREQUAL "INT")
-    target_compile_definitions(flute PRIVATE PROJECT_TYPE=PROJECT_INT)
-	message("int")
-elseif(PROJECT_TYPE STREQUAL "FLOAT")
-    target_compile_definitions(flute PRIVATE PROJECT_TYPE=PROJECT_FLOAT)
-	message("float")
-else()
-    message(FATAL_ERROR "PROJECT_TYPE must be INT or FLOAT")
-endif()
 
 # Link libraries
 target_link_libraries(flute
@@ -93,13 +76,10 @@ target_link_libraries(flute
     hardware_pwm
 )
 
-if (PICO_CYW43_SUPPORTED)
-    target_link_libraries(flute pico_cyw43_arch_none)
-endif()
-
+# Uncomment appropriate debugging option
 # pico_enable_stdio_usb(flute 1)
 # pico_enable_stdio_uart(flute 0)
-# pico_enable_stdio_semihosting (flute 1)
+pico_enable_stdio_semihosting (flute 1)
 
 # Generate map/bin/hex files
 pico_add_extra_outputs(flute)

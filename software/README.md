@@ -22,11 +22,10 @@ cd build
 cmake ..
 ```
 
-There are CMake flags available for easier debugging and development,
-which you don't need to worry about them for standard compilation:   
-*No debug and int32_t type on default*
+There are CMake flags available for easier debugging and development:   
+*No debug on default (no flag passed)*
 ```
--DDEBUG_MODE=<OFF/ON> -DPROJECT_TYPE=<INT/FLOAT>
+-DDEBUG_MODE=<OFF/ON>
 ```
 
 If succesful, run the Makefile from build directory:

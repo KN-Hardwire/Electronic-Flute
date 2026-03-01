@@ -15,9 +15,9 @@
 #include <stdint.h>
 #include <math.h>
 
-void generate_square_wave(const project_type freq, const uint16_t volume);
-project_type volume_to_duty(uint16_t volume);
-project_type get_frequency(const uint8_t mask);
+void generate_square_wave(const float freq, const uint16_t volume);
+uint16_t volume_to_duty(uint16_t volume);
+float get_frequency(uint8_t button_mask);
 uint16_t get_volume(void);
 uint16_t lowpass_iir(uint16_t new_sample);
 

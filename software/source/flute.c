@@ -1,7 +1,9 @@
 #include "functions.h"
 
 int main(void) {
-	// stdio_init_all();
+    #if DEBUG_MODE == 1
+	    stdio_init_all();
+    #endif
 
     const uint16_t buttons[BUTTON_COUNT] = {BUTTON1, BUTTON2, BUTTON3, BUTTON4, BUTTON5, BUTTON6, BUTTON7, BUTTON8};
 
