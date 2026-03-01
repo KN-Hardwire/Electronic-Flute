@@ -116,7 +116,7 @@ float get_frequency(uint8_t button_mask) {
 	}
 	// check octave shift button
 	if ((button_mask >> 7) & 1) {
-		return (note_frequencies[base_note]) / 2;
+		return (note_frequencies[base_note]) * 2;
 	}
 	return (note_frequencies[base_note]);
 }
