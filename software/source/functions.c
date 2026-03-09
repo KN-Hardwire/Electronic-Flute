@@ -106,17 +106,64 @@ uint16_t lowpass_iir(uint16_t new_sample) {
     return (uint16_t)filtered;
 }
 
-float get_frequency(uint8_t button_mask) {
-	uint8_t base_note = 7;
-	for (uint8_t button = 0; button < BUTTON_COUNT - 1; ++button) {
-		if ((button_mask >> button) & 1) {
-			base_note = button;
-			break;
-		}
-	}
-	// check octave shift button
-	if ((button_mask >> 7) & 1) {
-		return (note_frequencies[base_note]) * 2;
-	}
-	return (note_frequencies[base_note]);
+float get_frequency(uint8_t button_mask)
+{
+    // Special fingering for middle C
+    if ((button_mask & 0b01111111) == 0b0100000) // second-to-last hole covered
+    {
+        float freq = NOTE_C5;
+        if ((button_mask >> 7) & 1)  // octave button pressed → lower octave
+            freq /= 2.0f;           // C4 → C5
+        return freq;
+    }
+
+    // All holes open → highest note (C#6 / C#5)
+    if ((button_mask & 0b01111111) == 0b0000000)
+    {
+        float freq = NOTE_CS5;      // base C#5
+        if ((button_mask >> 7) & 1) // octave button pressed → lower octave
+            freq /= 2.0f;           // C#4 → C#5
+        return freq;
+    }
+
+    // Count consecutive pressed buttons from the bottom
+    uint8_t consecutive = 0;
+    for (uint8_t i = 0; i < 7; i++)
+    {
+        if ((button_mask >> i) & 1)
+            consecutive++;
+        else
+            break;
+    }
+
+    // Map to base notes C4 → B4
+    uint8_t base_note = 0;
+    switch(consecutive)
+    {
+        case 7: base_note = 0; break; // C4
+        case 6: base_note = 1; break; // D4
+        case 5: base_note = 2; break; // E4
+        case 4: base_note = 3; break; // F4
+        case 3: base_note = 4; break; // G4
+        case 2: base_note = 5; break; // A4
+        case 1: base_note = 6; break; // B4
+        case 0: base_note = 7; break; // C5
+    }
+
+    float freq = note_frequencies[base_note];
+
+    // Apply semitone (D#, F#, G#, A#, etc.)
+    if (consecutive < 6)
+    {
+        if ((button_mask >> (consecutive + 1)) & 1)
+            freq *= 1.059463f; // +1 semitone
+    }
+
+    // Octave handling
+    if ((button_mask >> 7) & 1)
+        freq /= 2.0f; // lower octave
+    else
+        freq *= 2.0f; // higher octave
+
+    return freq;
 }
