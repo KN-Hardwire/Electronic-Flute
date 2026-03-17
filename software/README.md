@@ -32,3 +32,20 @@ If succesful, run the Makefile from build directory:
 ```
 make
 ```
+
+## Flashing
+To flash use the SWD Port located on the board.
+Use a Rasberry Pi Pico flashed with [debugprobe_on_pico.uf2](https://github.com/raspberrypi/debugprobe/releases)
+and make a connection as follows:
+|     Pico      |     Flute     |
+| ------------- | ------------- |
+|      GND      |      GND      |
+|      CLK      |      GP2      |
+|      S_IO     |      GP3      |
+
+Alternatively you can use a dedicated Rasberry Pi Debugprobe.
+
+Then to upload the code, **with the 3V battery installed**, inside build folder run:
+```
+make flash
+```

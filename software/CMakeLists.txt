@@ -76,6 +76,13 @@ target_link_libraries(flute
     hardware_pwm
 )
 
+add_custom_target(flash
+	DEPENDS flute
+	COMMAND openocd -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 100" -c "program flute.elf verify reset exit"
+	WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+	COMMENT "Forcing BOOTSEL reboot and flashing motherboard.uf2..."
+)
+
 # Uncomment appropriate debugging option
 # pico_enable_stdio_usb(flute 1)
 # pico_enable_stdio_uart(flute 0)
