@@ -106,17 +106,3 @@ uint16_t lowpass_iir(uint16_t new_sample) {
     return (uint16_t)filtered;
 }
 
-float get_frequency(uint8_t button_mask) {
-	uint8_t base_note = 7;
-	for (uint8_t button = 0; button < BUTTON_COUNT - 1; ++button) {
-		if ((button_mask >> button) & 1) {
-			base_note = button;
-			break;
-		}
-	}
-	// check octave shift button
-	if ((button_mask >> 7) & 1) {
-		return (note_frequencies[base_note]) * 2;
-	}
-	return (note_frequencies[base_note]);
-}

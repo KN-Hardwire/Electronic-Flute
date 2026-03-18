@@ -1,4 +1,5 @@
 #include "functions.h"
+#include "notes.h"
 
 int main(void) {
     #if DEBUG_MODE == 1
@@ -30,7 +31,7 @@ int main(void) {
 			}
 		}
 
-		generate_square_wave(get_frequency(button_mask), lowpass_iir(get_volume()));
+		generate_square_wave(mask_freq[button_mask], lowpass_iir(get_volume()));
 	}
 
     return EXIT_SUCCESS;
