@@ -1,9 +1,7 @@
 # Electronic Flute
 This repository present HARDWIRE student club [AGH University of Cracow](https://en.wikipedia.org/wiki/AGH_University_of_Krak%C3%B3w) Electronic Flute project.
 
-<a href="https://youtube.com/xWjR7IvugFc" target="_blank">
-   <img src="https://youtube.com/xWjR7IvugFc/hqdefault.jpg" alt="Obejrzyj wideo" width="600" />
-</a>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/xWjR7IvugFc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 <img src="enclosure/images/flute_hardwire_beautiful.png" alt="Render" width="600">
 
