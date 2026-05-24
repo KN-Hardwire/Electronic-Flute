@@ -2,7 +2,7 @@
 This repository present HARDWIRE student club [AGH University of Cracow](https://en.wikipedia.org/wiki/AGH_University_of_Krak%C3%B3w) Electronic Flute project.
 
 <p align="center">
-  <a href="https://youtu.be" target="_blank">
+  <a href="https://youtu.be/xWjR7IvugFc" target="_blank">
      <img src="enclosure/images/vid_play.png" alt="Obejrzyj wideo" width="70%" style="border-radius: 20px;" />
   </a>
   <br />
